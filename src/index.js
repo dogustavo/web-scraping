@@ -1,8 +1,16 @@
 const {URL} = require('./config')
 
 const puppeteer = require('puppeteer');
+const https = require('https');
 const fs = require('fs');
-const axios = require('axios').default;
+
+const { jsPDF } = require("jspdf");
+
+const doc = new jsPDF({
+  orientation: "p",
+  unit: "mm",
+  format: custom
+});
 
 (async () => {
 
@@ -22,17 +30,17 @@ const axios = require('axios').default;
     return list
   })
 
-  imageList.map(item => {
-    axios.get(item.src)
-        .then(res => {
-          if(res) {
-          }
-        })
-        .catch(err => {
-          return err
-        })
+  await imageList.map((item, id) => {
+    https.get(item.src, (res) => {
+      if(res) {
+        const file = fs.createWriteStream(`file-${id}.png`)
+        res.pipe(file)
+      }
+
+    })
   })
 
+  doc.save()
 
   // console.log(imageList)
   // await browser.close();
