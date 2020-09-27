@@ -2,6 +2,7 @@ const {URL} = require('./config')
 
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const axios = require('axios').default;
 
 (async () => {
 
@@ -9,15 +10,30 @@ const fs = require('fs');
   const page = await browser.newPage();
   await page.goto(URL);
 
-  await page.evaluate(() => {
+  const imageList = await page.evaluate(() => {
     const mangaPages = document.querySelectorAll('.read-slideshow img')
 
     const nodeList = [...mangaPages]
     
-     nodeList.map(({src}) => {
-        console.log(src)
-    })
+    const list = nodeList.map(({src}) => ({
+      src
+    }))
 
+    return list
   })
-//   await browser.close();
+
+  imageList.map(item => {
+    axios.get(item.src)
+        .then(res => {
+          if(res) {
+          }
+        })
+        .catch(err => {
+          return err
+        })
+  })
+
+
+  // console.log(imageList)
+  // await browser.close();
 })();
